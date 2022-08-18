@@ -1,0 +1,9 @@
+*.jpg
+*.png
+*.emf
+
+*.ppt*
+
+*.prefs
+.classpath
+.project
