@@ -7,3 +7,6 @@
 *.prefs
 .classpath
 .project
+
+test/
+bin/
