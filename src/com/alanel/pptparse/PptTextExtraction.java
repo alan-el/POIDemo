@@ -17,8 +17,9 @@ import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 public class PptTextExtraction 
 {
-	public static int PptSingleSlideTextExtractor(String pathname) throws IOException 
+	public static int PptSingleSlideTextExtractor(String pathname, int index) throws IOException 
 	{
+		
 		String dirName = new String(pathname);
 		while(dirName.charAt(dirName.length() - 1) != '.')
 		{
@@ -36,13 +37,42 @@ public class PptTextExtraction
 		List<HSLFSlide> list = ppt.getSlides();
 		
 		int slidesNum = list.size();
-		String sn = String.valueOf(slidesNum);
-		FileOutputStream osn = new FileOutputStream(dirName + "\\slides_num.txt");
-		osn.write(sn.getBytes());
-		osn.close();
 		
-		for(HSLFSlide slide : list)
+		if(index == 0)
 		{
+
+			String sn = String.valueOf(slidesNum);
+			FileOutputStream osn = new FileOutputStream(dirName + "\\slides_num.txt");
+			osn.write(sn.getBytes());
+			osn.close();
+			
+			for(HSLFSlide slide : list)
+			{
+				int sliderNumber = slide.getSlideNumber();
+				System.out.println("slide number = " + sliderNumber);
+				
+				List<List<HSLFTextParagraph>> tpLists =  slide.getTextParagraphs();
+				int textNumber = 1;
+				for(List<HSLFTextParagraph> tpList : tpLists )
+				{
+					System.out.println("	tpList number = " + tpLists.indexOf(tpList));
+	
+					String s = HSLFTextParagraph.getText(tpList);
+					if(!s.isEmpty())
+					{
+						FileOutputStream out = new FileOutputStream(dirName + "\\slide" + sliderNumber 
+																	+ "_text" + textNumber++ + ".txt");
+						out.write(s.getBytes());
+						out.close();
+					}
+						
+				}
+			}
+		}
+		
+		else if(index > 0)
+		{
+			HSLFSlide slide = list.get(index - 1);
 			int sliderNumber = slide.getSlideNumber();
 			System.out.println("slide number = " + sliderNumber);
 			
@@ -67,7 +97,7 @@ public class PptTextExtraction
 		return list.size();
 	}
 	
-	public static int PptxSingleSlideTextExtractor(String pathname) throws IOException
+	public static int PptxSingleSlideTextExtractor(String pathname, int index) throws IOException
 	{
 		String dirName = new String(pathname);
 		while(dirName.charAt(dirName.length() - 1) != '.')
@@ -89,14 +119,55 @@ public class PptTextExtraction
 		List <XSLFSlide> list = ppt.getSlides();
 		
 		int slidesNum = list.size();
-		String sn = String.valueOf(slidesNum);
-		FileOutputStream osn = new FileOutputStream(dirName + "\\slides_num.txt");
-		osn.write(sn.getBytes());
-		osn.close();
 		
-        for (XSLFSlide slide : list) 
-        {
-        	int sliderNumber = slide.getSlideNumber();
+		
+		if(index == 0)
+		{
+			String sn = String.valueOf(slidesNum);
+			FileOutputStream osn = new FileOutputStream(dirName + "\\slides_num.txt");
+			osn.write(sn.getBytes());
+			osn.close();
+			
+			for (XSLFSlide slide : list) 
+	        {
+	        	int sliderNumber = slide.getSlideNumber();
+				System.out.println("slide number = " + sliderNumber);
+	        	int textNumber = 1;
+	        	
+	            for (XSLFShape shape : slide) 
+	            {
+	                if (shape instanceof XSLFTextShape) 
+	                {
+	                	System.out.println("	Shape ID = " + shape.getShapeId());
+	                    XSLFTextShape txShape = (XSLFTextShape) shape;
+	                    String s = txShape.getText();
+	                    
+	                    if(!s.isEmpty())
+	    				{
+	    					FileOutputStream out = new FileOutputStream(dirName + "\\slide" + sliderNumber 
+	    																+ "_text" + textNumber++ + ".txt");
+	    					out.write(s.getBytes());
+	    					out.close();
+	    				}
+	                } 
+	//                else if (shape instanceof XSLFPictureShape) 
+	//                {
+	//                    XSLFPictureShape pShape = (XSLFPictureShape) shape;
+	//                    XSLFPictureData pData = pShape.getPictureData();
+	//                    System.out.println(pData.getFileName());
+	//                } 
+	//                else 
+	//                {
+	//                	System.out.println("Process me: " + shape.getClass());
+	//                }
+	            }
+	        }
+		}
+		
+		else if(index > 0)
+		{
+			XSLFSlide slide = list.get(index - 1);
+			int sliderNumber = slide.getSlideNumber();
 			System.out.println("slide number = " + sliderNumber);
         	int textNumber = 1;
         	
@@ -116,18 +187,8 @@ public class PptTextExtraction
     					out.close();
     				}
                 } 
-//                else if (shape instanceof XSLFPictureShape) 
-//                {
-//                    XSLFPictureShape pShape = (XSLFPictureShape) shape;
-//                    XSLFPictureData pData = pShape.getPictureData();
-//                    System.out.println(pData.getFileName());
-//                } 
-//                else 
-//                {
-//                	System.out.println("Process me: " + shape.getClass());
-//                }
             }
-        }
+		}
         
         ppt.close();
         return list.size();

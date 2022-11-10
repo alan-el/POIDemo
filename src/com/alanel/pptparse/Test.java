@@ -8,7 +8,7 @@ public class Test {
 		// TODO Auto-generated method stub
 		try 
 		{
-			PptTextExtraction.PptSingleSlideTextExtractor("D:\\Qt_workspace\\src\\TeachTool\\TeachTool\\doc\\test.ppt");
+			PptPictExtraction.PptSingleSlidePictExtractor("D:\\eclipse_workspace\\POIDemo\\test.ppt", 0);
 		} 
 		catch (IOException e) 
 		{
